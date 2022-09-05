@@ -15,7 +15,7 @@ def query_weather_api(location, start_date, end_date=None, include='days', verbo
         api_query += f'/{end_date}'
 
     # Adding query parameters and api key
-    api_query += f'&contentType=csv&include={include}&unitGroup=metric&key={API_KEY}'
+    api_query += f'?&contentType=csv&include={include}&unitGroup=metric&timezone=Z&key={API_KEY}'
 
     if verbose:
         print(' - Running query URL: ', api_query)
@@ -54,7 +54,21 @@ def query_weather_api_multiple_times(locations, start_dates, end_dates=None, inc
                                         verbose=verbose)
         response_df_list.append(response_df)
 
-    return pd.concat(response_df_list)
+    api_df = pd.concat(response_df_list)
+
+    # The api column "name" returns the latitude,longitud pair that we need for the actual dataframe.
+    api_df['latitude'] = api_df['name'].apply(lambda x: float(x.split(',')[0]))
+    api_df['longitude'] = api_df['name'].apply(lambda x: float(x.split(',')[1]))
+    api_df = api_df.rename(columns={'datetime': 'date'})
+    api_df['date'] = pd.to_datetime(api_df['date'])
+
+    if include == 'hours':
+        # Extract the time information from date
+        api_df['hour'] = api_df['date'].dt.time
+        api_df['date'] = api_df['date'].dt.date
+
+    print('ACA', api_df)
+    return api_df
 
 
 

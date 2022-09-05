@@ -4,7 +4,8 @@ sys.path.append('../..')
 import pytest
 import pandas as pd
 import numpy as np
-from src.utils.db_queries import select_from_daily_weather_data, get_connection, select_from_hourly_weather_data
+from src.utils.db_queries import select_from_daily_weather_data, get_connection, select_from_hourly_weather_data, \
+    insert_into_weather_daily_data, insert_into_weather_hourly_data
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -68,6 +69,35 @@ def test_select_from_hourly_weather_data_some_rows(weather_data_sqlite):
     df = select_from_hourly_weather_data(conn, dates, hours, latitudes, longitudes)
 
     assert len(df) == 2
+
+
+def test_insert_into_weather_daily_data(weather_data_sqlite):
+    insert_data = [
+        ('2022-01-13', 70.3, 30.1, 30.1, 'Rain'),
+        ('2022-01-15', 80.3, 30.1, 30.1, 'Rain'),
+    ]
+    insert_df = pd.DataFrame(insert_data, columns=['date', 'latitude', 'longitude', 'temp', 'conditions'])
+    conn = weather_data_sqlite
+    insert_into_weather_daily_data(conn, insert_df)
+
+    db_data = conn.execute('SELECT * FROM weather_daily_data').fetchall()
+
+    assert len(db_data) == 6
+
+
+def test_insert_into_weather_hourly_data(weather_data_sqlite):
+    insert_data = [
+        ('2022-01-13', '00:00:00', 70.3, 30.1, 30.1, 'Rain'),
+        ('2022-01-15', '01:00:00', 80.3, 30.1, 30.1, 'Rain'),
+    ]
+    insert_df = pd.DataFrame(insert_data, columns=['date', 'hour', 'latitude', 'longitude', 'temp', 'conditions'])
+    conn = weather_data_sqlite
+    insert_into_weather_hourly_data(conn, insert_df)
+
+    db_data = conn.execute('SELECT * FROM weather_hourly_data').fetchall()
+
+    assert len(db_data) == 6
+
 
 
 

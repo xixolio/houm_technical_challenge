@@ -1,6 +1,8 @@
 import os
 import sqlite3
 import pandas as pd
+from sqlalchemy import create_engine
+
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -8,6 +10,11 @@ BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 def get_connection(path, db_name):
     conn = sqlite3.connect(f'{path}{db_name}')
     return conn
+
+
+#def get_connection(path, db_name):
+#    engine = create_engine(f'sqlite:///{path}{db_name}', echo=False)
+#    return engine.connect()
 
 
 def select_from_daily_weather_data(conn, dates, latitudes, longitudes):
@@ -48,6 +55,16 @@ def select_from_hourly_weather_data(conn, dates, hours, latitudes, longitudes):
     data = res.fetchall()
 
     return pd.DataFrame(data, columns=columns)
+
+
+def insert_into_weather_daily_data(conn, df):
+    cursor = conn.cursor()
+    cursor.executemany('INSERT INTO weather_daily_data VALUES(?, ?, ?, ?, ?)', df.values)
+
+
+def insert_into_weather_hourly_data(conn, df):
+    cursor = conn.cursor()
+    cursor.executemany('INSERT INTO weather_hourly_data VALUES(?, ?, ?, ?, ?, ?)', df.values)
 
 
 

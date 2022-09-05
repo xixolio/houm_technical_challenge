@@ -9,6 +9,22 @@ API_KEY = 'NQJUZHVSAXKBCBZAC7AVE8ZCC'
 
 
 def query_weather_api(location, start_date, end_date=None, include='days', verbose=False):
+    """
+    Queries the Visualcrossing Weather API for weather information
+
+    Takes a location, date, and whether you want daily summary or hourly data and returns the weather
+    data associated to it.
+
+    Parameters
+    ----------
+    :param str location: 'latitude,longitud' string
+    :param str start_date: date to query in 'yyyy-mm-dd' format
+    :param str end_date: not used
+    :param str include: days or hours, whether to return a daily summary or hourly information from the date
+    :param bool verbose: whether to print the query url or not
+
+    :return: DataFrame(name, datetime, temp, conditions,...): df with response
+    """
     api_query = f'{BASE_URL}{location}/{start_date}'
 
     if end_date is not None:
@@ -37,6 +53,22 @@ def query_weather_api(location, start_date, end_date=None, include='days', verbo
 
 
 def query_weather_api_multiple_times(locations, start_dates, end_dates=None, include='days', verbose=False):
+    """
+    Queries the Visual Crossing weather api for each tuple of values
+
+    Receives a list of locations and start_dates and for each pair calls query_weather_api, concatenating
+    the results in a DataFrame and reformating its columns.
+
+    Parameters
+    ----------
+    :param list str locations: list of 'latitude,longitud' strings
+    :param list str start_dates: list of dates
+    :param list end_dates: unused
+    :param str include:  days or hours, whether to return a daily summary or hourly information from the date
+    :param bool verbose: whether to print the query url or not
+    :return: DataFrame(date, {hour}, latitude, longitude, temp, conditions): df with concatenated responses.
+        If include == 'hours' the df has the hour column as well.
+    """
     if len(locations) != len(start_dates):
         raise Exception("locations and start_dates should have same number of elements.")
 

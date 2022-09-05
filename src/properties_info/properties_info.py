@@ -21,13 +21,24 @@ class PropertiesInfo:
         return visits
 
     def load_properties_data(self):
-        self.properties = pd.read_csv(f'{BASE_PATH}/../data/{self.properties_filename}')
-        self.users = pd.read_csv(f'{BASE_PATH}/../data/{self.users_filename}')
+        properties = pd.read_csv(f'{BASE_PATH}/../data/{self.properties_filename}')
+        return properties
+
+    def load_users_data(self):
+        users = pd.read_csv(f'{BASE_PATH}/../data/{self.users_filename}')
+        return users
 
     def get_total_visits(self):
         visits = self.load_visits_data()[['type_visit', 'status']]
         completed_visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
         return len(completed_visits)
+
+    def get_average_properties_by_user(self):
+        users = self.load_users_data()
+        result = users.groupby('user_id').count()['property_id'].mean()
+        return result
+
+
 
 
 

@@ -45,7 +45,6 @@ def weather_data_sqlite(tmpdir, scope='session'):
 def test_select_from_daily_weather_data_some_rows(weather_data_sqlite):
     # Third row doesn't exist in the db
     dates = ['2022-01-10', '2022-01-11', '2021-01-11']
-    #locations = ['Valdivia', 'Santiago', 'Valdivia']
     latitudes = [70.3, 70.3, 0]
     longitudes = [30.1, 30.1, 0]
 
@@ -60,7 +59,6 @@ def test_select_from_hourly_weather_data_some_rows(weather_data_sqlite):
     # Third row doesn't exist in the db
     dates = ['2022-01-10', '2022-01-12', '2021-01-11']
     hours = ['00:00:00', '20:00:00', '21:00:00']
-    #locations = ['Valdivia', 'Santiago', 'Valdivia']
     latitudes = [70.3, 70.3, 0]
     longitudes = [30.1, 30.1, 0]
 

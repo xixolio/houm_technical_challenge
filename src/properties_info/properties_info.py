@@ -18,15 +18,96 @@ class PropertiesInfo:
         self.users_filename = 'users.csv'
         self.conn = get_connection(f'{BASE_PATH}/../', 'weather_api.db')
 
-    def load_visits_data(self):
+    def get_total_visits(self):
+        visits = self._load_visits_data()[['type_visit', 'status']]
+        completed_visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
+        return len(completed_visits)
+
+    def get_average_properties_by_user(self):
+        users = self._load_users_data()
+        print('ACAAAAAA', users)
+        result = users.groupby('user_id').count()['property_id'].mean()
+        return result
+
+    def get_average_temperature_in_visits_by_user(self, user_id):
+        # Load and preprocess visits information
+        visits = self._load_visits_data()
+        visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
+        visits = visits[['scheduled_id', 'property_id', 'begin_date', 'end_date']]
+        visits = self._visits_preprocessing(visits)
+
+        # Load user information
+        users = self._load_users_data()
+        users = users[users['user_id'] == user_id][['user_id', 'property_id']]
+
+        # Load properties information
+        properties = self._load_properties_data()
+        properties = properties[['property_id', 'latitude', 'longitude']]
+
+        # Merge all dfs and get hourly data
+        visits = self.merge_data(visits, properties, users)
+        hourly_visits = self._get_hourly_visits_df(visits)
+        hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
+
+        # Compute the average temperature
+        return self.compute_average_temperature_by_visit(hourly_visits)
+
+    def get_average_temperature_in_visits_by_weather_condition(self, weather_condition):
+        # Load and preprocess visits information
+        visits = self._load_visits_data()
+        visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
+        visits = visits[['scheduled_id', 'property_id', 'begin_date', 'end_date']]
+        visits = self._visits_preprocessing(visits)
+
+        # Load properties information
+        properties = self._load_properties_data()
+        properties = properties[['property_id', 'latitude', 'longitude']]
+        properties = properties.loc[0:40]
+
+        # Merge all dfs and get daily conditions data
+        visits = self.merge_data(visits, properties)
+        visits = self._add_daily_conditions_to_visits(visits)
+
+        # Filter by Rain keyword and drop conditions column
+        visits = visits[visits['conditions'].str.contains(weather_condition)]
+        visits = visits.drop(columns=['conditions', 'temperature'])
+
+        # Get hourly visits with temperatures and calculate mean temperatures for each visit
+        hourly_visits = self._get_hourly_visits_df(visits)
+        hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
+
+        return self.compute_average_temperature_by_visit(hourly_visits)
+
+    def get_average_temperature_in_visits_by_location(self, location):
+        # Load and preprocess visits information
+        visits = self._load_visits_data()
+        visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
+        visits = visits[['scheduled_id', 'property_id', 'begin_date', 'end_date']]
+        visits = self._visits_preprocessing(visits)
+
+        # Load properties information and filter by location
+        properties = self._load_properties_data()
+        properties = properties[['property_id', 'latitude', 'longitude', 'localidad']]
+        properties = properties[properties['localidad'] == 'Suba']
+
+        # Merge all dfs
+        visits = self.merge_data(visits, properties)
+
+        # Get hourly visits with temperatures and calculate mean temperatures for each visit
+        hourly_visits = self._get_hourly_visits_df(visits)
+        hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
+
+        return self.compute_average_temperature_by_visit(hourly_visits)
+
+    def _load_visits_data(self):
         visits = pd.read_csv(f'{BASE_PATH}/../data/{self.visits_filename}')
         return visits
 
-    def load_properties_data(self):
+    def _load_properties_data(self):
         properties = pd.read_csv(f'{BASE_PATH}/../data/{self.properties_filename}')
         return properties
 
-    def load_users_data(self):
+    def _load_users_data(self):
         users = pd.read_csv(f'{BASE_PATH}/../data/{self.users_filename}')
         return users
 
@@ -47,48 +128,17 @@ class PropertiesInfo:
         visits['end_date'] = pd.to_datetime(visits['end_date']).dt.tz_convert(None).dt.floor('h')
         return visits
 
-    def get_total_visits(self):
-        visits = self.load_visits_data()[['type_visit', 'status']]
-        completed_visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
-        return len(completed_visits)
-
-    def get_average_properties_by_user(self):
-        users = self.load_users_data()
-        print('ACAAAAAA', users)
-        result = users.groupby('user_id').count()['property_id'].mean()
-        return result
-
-    def get_average_temperature_in_visits_by_user(self, user_id):
-        # Load and preprocess visits information
-        visits = self.load_visits_data()
-        visits = visits[(visits['type_visit'] == 'Visit') & (visits['status'] == 'Done')]
-        visits = visits[['scheduled_id', 'property_id', 'begin_date', 'end_date']]
-        visits = self._visits_preprocessing(visits)
-
-        # Load user information
-        users = self.load_users_data()
-        users = users[users['user_id'] == user_id][['user_id', 'property_id']]
-
-        # Load properties information
-        properties = self.load_properties_data()
-        properties = properties[['property_id', 'latitude', 'longitude']]
-
-        # Merge all dfs and get hourly data
-        visits = self.merge_data(visits, properties, users)
-        hourly_visits = self._get_hourly_visits_df(visits)
-        hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
-
-        # Compute the average temperature
-        print(hourly_visits)
-        mean_temp_visits = hourly_visits[['scheduled_id', 'temperature']].groupby('scheduled_id').mean()
-        return mean_temp_visits.mean()['temperature']
-
     @staticmethod
     def merge_data(visits, properties, users=None):
         if users is not None:
             properties = properties.merge(users, on='property_id')
         visits = properties.merge(visits, on='property_id')
         return visits
+
+    @staticmethod
+    def compute_average_temperature_by_visit(hourly_visits):
+        mean_temp_visits = hourly_visits[['scheduled_id', 'temperature']].groupby('scheduled_id').mean()
+        return mean_temp_visits.mean()['temperature']
 
     @staticmethod
     def _get_hourly_visits_df(visits):
@@ -152,6 +202,33 @@ class PropertiesInfo:
                                              hours=hours)
 
         return hourly_visits.merge(weather_df, on=['date', 'latitude', 'longitude'])
+
+    def _add_daily_conditions_to_visits(self, visits):
+        """
+        Adds the conditions value for each row of daily visits.
+
+        Receives the visits DataFrame and adds the column Conditions to each row, calling the weather API taking the
+        latitude, longitude, and date values of the row. We assume that the day corresponds to the begin_date day,
+        ignoring the end_date.
+
+        Parameters
+        ----------
+        :param DataFrame visits: pandas DataFrame with at least latitude, longitude, scheduled_id, property_id
+                                 and date
+        :return: DataFrame visits DataFrame with conditions column (conditions)
+        """
+
+        dates = list(visits['begin_date'].dt.strftime('%Y-%m-%d').values)
+        latitudes = list(visits['latitude'].values)
+        longitudes = list(visits['longitude'].values)
+
+        columns = ['date', 'latitude', 'longitude', 'conditions', 'temperature']
+
+        weather_df = get_data_from_db_or_api(self.conn, dates, latitudes, longitudes, columns, include='days')
+        visits['date'] = pd.to_datetime(visits['begin_date'].dt.strftime('%Y-%m-%d'))
+        visits = visits.merge(weather_df, on=['date', 'latitude', 'longitude'])
+        visits = visits.drop(columns='date')
+        return visits
 
 
 

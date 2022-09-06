@@ -47,7 +47,7 @@ def test_query_weather_api_multiple_times_daily(mocker,):
     locations = ['Valdivia', 'Puerto Montt']
     dates = ['2022-01-10', '2022-01-11']
     response_df = query_weather_api_multiple_times(locations=locations, start_dates=dates)
-    columns = ['date', 'latitude', 'longitude', 'temp', 'conditions']
+    columns = ['date', 'latitude', 'longitude', 'temperature', 'conditions']
     assert len(response_df) == 2 and all([column in response_df.columns for column in columns])
 
 
@@ -57,7 +57,7 @@ def test_query_weather_api_multiple_times_hourly(mocker,):
     locations = ['Valdivia', 'Valdivia', 'Puerto Montt']
     dates = ['2022-01-10', '2022-01-10', '2022-01-11']
     response_df = query_weather_api_multiple_times(locations=locations, start_dates=dates, include='hours')
-    columns = ['date', 'hour', 'latitude', 'longitude', 'temp', 'conditions']
+    columns = ['date', 'latitude', 'longitude', 'temperature', 'conditions']
     assert len(response_df) == 2 and all([column in response_df.columns for column in columns])
 
 

@@ -5,7 +5,7 @@ import pandas as pd
 
 # TODO: move to config file later
 BASE_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
-API_KEY = 'NQJUZHVSAXKBCBZAC7AVE8ZCC'
+API_KEY = 'RZBU5Q7FVJMLGSL5BDH3Y4N72'
 
 
 def query_weather_api(location, start_date, end_date=None, include='days', verbose=False):

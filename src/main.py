@@ -15,3 +15,9 @@ if __name__ == '__main__':
 
     # Question 3
     print(properties_info.get_average_temperature_in_visits_by_user(2))
+
+    # Question 4
+    print(properties_info.get_average_temperature_in_visits_by_weather_condition('Rain'))
+
+    # Question 5
+    print(properties_info.get_average_temperature_in_visits_by_location('Suba'))

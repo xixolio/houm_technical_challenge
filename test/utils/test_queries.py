@@ -13,7 +13,6 @@ BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 def query_weather_api_daily(*args, **kwargs):
 
     dates = ['2022-01-10', '2022-01-11']
-    #locations = ['Valdivia', 'Santiago']
     latitudes = [70.3, 70.3]
     longitudes = [30.1, 30.1]
     temps = [20, 30]
@@ -48,6 +47,25 @@ def select_from_daily_weather_data(*args, **kwargs):
     return return_values
 
 
+def test_get_data_from_db_or_api_daily_some_in_db(mocker,):
+    dates = ['2022-01-10', '2022-01-11', '2021-01-11']
+    latitudes = [70.3, 70.3, 0]
+    longitudes = [30.1, 30.1, 0]
+    columns = ['date', 'latitude', 'longitude', 'temp', 'conditions']
+
+    select_from_daily_weather_data_mock = mocker.patch('src.utils.queries.select_from_daily_weather_data',
+                                                       side_effect=select_from_daily_weather_data)
+
+    query_weather_api_mock = mocker.patch('src.utils.queries.query_weather_api_multiple_times',
+                                          side_effect=query_weather_api_daily)
+    insert_weather_daily_data_mock = mocker.patch('src.utils.queries.insert_into_weather_daily_data')
+
+    df = get_data_from_db_or_api(None, dates, latitudes, longitudes, columns, include='days')
+
+    assert len(df) == 3
+    insert_weather_daily_data_mock.assert_called()
+
+
 def select_from_hourly_weather_data(*args, **kwargs):
     dates = ['2021-01-11']
     hours = ['14:00:00']
@@ -69,50 +87,29 @@ def select_from_hourly_weather_data(*args, **kwargs):
 
 
 def query_weather_api_hourly(*args, **kwargs):
-    dates = ['2022-01-10', '2022-01-11']
-    hours = ['00:00:00', '21:00:00']
+    dates = ['2022-01-10 00:00:00', '2022-01-11 21:00:00']
     latitudes = [70.3, 70.3]
     longitudes = [30.1, 30.1]
     temps = [20, 30]
     conditions = ['Rain', 'Snow']
 
     data = {'date': dates,
-            'hour': hours,
             'latitude': latitudes,
             'longitude': longitudes,
             'temp': temps,
             'conditions': conditions}
 
+    data['date'] = pd.to_datetime(data['date'])
     return_values = pd.DataFrame(data)
     return return_values
 
 
-def test_get_data_from_db_or_api_daily_some_in_db(mocker,):
+def test_get_data_from_db_or_api_hourly_some_in_db(mocker,):
     dates = ['2022-01-10', '2022-01-11', '2021-01-11']
-    #locations = ['Valdivia', 'Santiago', 'Valdivia']
+    hours = ['00:00:00', '21:00:00', '14:00:00']
     latitudes = [70.3, 70.3, 0]
     longitudes = [30.1, 30.1, 0]
     columns = ['date', 'latitude', 'longitude', 'temp', 'conditions']
-
-    select_from_daily_weather_data_mock = mocker.patch('src.utils.queries.select_from_daily_weather_data',
-                                                       side_effect=select_from_daily_weather_data)
-
-    query_weather_api_mock = mocker.patch('src.utils.queries.query_weather_api_multiple_times',
-                                          side_effect=query_weather_api_daily)
-    insert_weather_daily_data_mock = mocker.patch('src.utils.queries.insert_into_weather_daily_data')
-
-    df = get_data_from_db_or_api(None, dates, latitudes, longitudes, columns, include='days')
-
-    assert len(df) == 3
-    insert_weather_daily_data_mock.assert_called()
-
-
-def test_get_data_from_db_or_api_hourly_some_in_db(mocker,):
-    dates = ['2022-01-10', '2022-01-11', '2021-01-11']
-    hours = ['00:00:00', '21:00:00', '14:00']
-    latitudes = [70.3, 70.3, 0]
-    longitudes = [30.1, 30.1, 0]
-    columns = ['date', 'hour', 'latitude', 'longitude', 'temp', 'conditions']
 
     select_from_daily_weather_data_mock = mocker.patch('src.utils.queries.select_from_hourly_weather_data',
                                                        side_effect=select_from_hourly_weather_data)
@@ -121,10 +118,13 @@ def test_get_data_from_db_or_api_hourly_some_in_db(mocker,):
                                           side_effect=query_weather_api_hourly)
     insert_weather_hourly_data_mock = mocker.patch('src.utils.queries.insert_into_weather_hourly_data')
 
-    df = get_data_from_db_or_api(None, dates, latitudes, longitudes, columns, include='hours')
+    df = get_data_from_db_or_api(None, dates, latitudes, longitudes, columns, include='hours', hours=hours)
 
     assert len(df) == 3
     insert_weather_hourly_data_mock.assert_called()
+
+
+
 
 
 

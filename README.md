@@ -28,7 +28,7 @@ Each question was coded as an independent method inside the `PropertiesInfo` cla
 - Question 5: `get_average_temperature_in_visits_by_location`
 
 ## CONFIG FILE
-A config file can be ofund at _src/config.yaml_. In it, you can specify the API KEY, the location of the csv data, the filenames of the data, among others. 
+A config file can be found at _src/config.yaml_. In it, you can specify the API KEY, the location of the csv data, the filenames of the data, among others. 
 
 ## Assumptions
 

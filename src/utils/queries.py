@@ -12,7 +12,7 @@ from src.utils.db_queries import select_from_daily_weather_data, select_from_hou
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include='days', hours=[]):
+def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include='days', hours=[], verbose=False):
     """
     Get weather API data either from the DB or the API
 
@@ -55,8 +55,11 @@ def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include
         # Select all locations, dates, latitudes and longitudes not found in db.
         # Remember that in the API locations is latitudes,longitudes
         keys_not_present_in_db_index = [key not in db_key_strings for key in key_strings]
-        print("Found", len(key_strings) - sum(keys_not_present_in_db_index), "out of ", len(key_strings),
-              " entries in the DB.")
+
+        if verbose:
+            print("Found", len(key_strings) - sum(keys_not_present_in_db_index), "out of ", len(key_strings),
+                  " entries in the DB.")
+
         dates = list(np.array(dates)[keys_not_present_in_db_index])
         latitudes = list(np.array(latitudes)[keys_not_present_in_db_index])
         longitudes = list(np.array(longitudes)[keys_not_present_in_db_index])
@@ -65,7 +68,7 @@ def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include
 
         # Search remaining in the API and save to the db if any
         if len(locations) > 0:
-            api_df = query_weather_api_multiple_times(locations, start_dates=dates, include=include, verbose=True)
+            api_df = query_weather_api_multiple_times(locations, start_dates=dates, include=include, verbose=verbose)
             api_df = api_df[columns]
 
             # To save in the db, we create a str_date column
@@ -96,8 +99,11 @@ def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include
         # Select all locations, dates, hours, latitudes and longitudes not found in db.
         # Remember that in the API locations is latitudes,longitudes
         keys_not_present_in_db_index = [key not in db_key_strings for key in key_strings]
-        print("Found", len(key_strings) - sum(keys_not_present_in_db_index), "out of ", len(key_strings),
-              " entries in the DB.")
+
+        if verbose:
+            print("Found", len(key_strings) - sum(keys_not_present_in_db_index), "out of ", len(key_strings),
+                  " entries in the DB.")
+
         dates = list(np.array(dates)[keys_not_present_in_db_index])
         latitudes = list(np.array(latitudes)[keys_not_present_in_db_index])
         longitudes = list(np.array(longitudes)[keys_not_present_in_db_index])
@@ -105,11 +111,11 @@ def get_data_from_db_or_api(conn, dates, latitudes, longitudes, columns, include
                      for latitude, longitude in zip(latitudes, longitudes)]
 
         # Remember to recover the whole datetime from the db data and convert to UTC to avoid problems
-        db_df['date'] = pd.to_datetime(db_df['date'].astype('str') + ' ' + db_df['hour'].astype('str'))#.dt.tz_convert('UTC')
+        db_df['date'] = pd.to_datetime(db_df['date'].astype('str') + ' ' + db_df['hour'].astype('str'))
 
         # Search remaining in the API and save to the db, if any
         if len(locations) > 0:
-            api_df = query_weather_api_multiple_times(locations, start_dates=dates, include=include, verbose=True)
+            api_df = query_weather_api_multiple_times(locations, start_dates=dates, include=include, verbose=verbose)
             api_df = api_df[columns]
 
             # To save the data in the DB, we split date and hour

@@ -6,17 +6,25 @@ import pandas as pd
 import numpy as np
 from src.utils.connections import get_connection
 from src.utils.queries import get_data_from_db_or_api
+from src.utils.config_utils import read_yaml
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+
+CONFIG = read_yaml(f'{BASE_PATH}/../config.yaml')
 
 
 class PropertiesInfo:
     def __init__(self):
-        # TODO: put these in config file
-        self.visits_filename = 'visits.csv'
-        self.properties_filename = 'properties.csv'
-        self.users_filename = 'users.csv'
+        """
+        Loads config information regarding the data files and gets the DB connector
+        """
+        self.data_path = CONFIG['DATA']['PATH']
+        self.visits_filename = CONFIG['DATA']['VISITS_DATA_FILENAME']
+        self.properties_filename = CONFIG['DATA']['PROPERTIES_DATA_FILENAME']
+        self.users_filename = CONFIG['DATA']['USERS_DATA_FILENAME']
+        self.app_verbose = CONFIG['APP']['VERBOSE']
         self.conn = get_connection(f'{BASE_PATH}/../', 'weather_api.db')
+
 
     def get_total_visits(self):
         """
@@ -186,7 +194,7 @@ class PropertiesInfo:
         :return: DataFrame with visit data information, columns ('scheduled_id', 'property_id', 'begin_date',
                 'end_date', 'type_visit', 'status',)
         """
-        visits = pd.read_csv(f'{BASE_PATH}/../data/{self.visits_filename}')
+        visits = pd.read_csv(f'{BASE_PATH}/../{self.data_path}{self.visits_filename}')
         return visits
 
     def _load_properties_data(self):
@@ -196,7 +204,7 @@ class PropertiesInfo:
                 'bedrooms', 'bathrooms', 'parking_lots', 'services', 'balcony', 'pool', 'latitude', 'longitude',
                 'localidad', 'city', 'region', 'country')
         """
-        properties = pd.read_csv(f'{BASE_PATH}/../data/{self.properties_filename}')
+        properties = pd.read_csv(f'{BASE_PATH}/../{self.data_path}{self.properties_filename}')
         return properties
 
     def _load_users_data(self):
@@ -205,7 +213,7 @@ class PropertiesInfo:
         :return: DataFrame with users data information, columns ('property_id', 'user_id', 'first_name', 'last_name',
                 'address')
         """
-        users = pd.read_csv(f'{BASE_PATH}/../data/{self.users_filename}')
+        users = pd.read_csv(f'{BASE_PATH}/../{self.data_path}{self.users_filename}')
         return users
 
     @staticmethod
@@ -318,7 +326,7 @@ class PropertiesInfo:
         columns = ['date', 'latitude', 'longitude', 'conditions', 'temperature']
 
         weather_df = get_data_from_db_or_api(self.conn, dates, latitudes, longitudes, columns, include='hours',
-                                             hours=hours)
+                                             hours=hours, verbose=self.app_verbose)
 
         return hourly_visits.merge(weather_df, on=['date', 'latitude', 'longitude'])
 
@@ -343,7 +351,8 @@ class PropertiesInfo:
 
         columns = ['date', 'latitude', 'longitude', 'conditions', 'temperature']
 
-        weather_df = get_data_from_db_or_api(self.conn, dates, latitudes, longitudes, columns, include='days')
+        weather_df = get_data_from_db_or_api(self.conn, dates, latitudes, longitudes, columns, include='days',
+                                             verbose=self.app_verbose)
         visits['date'] = pd.to_datetime(visits['begin_date'].dt.strftime('%Y-%m-%d'))
         visits = visits.merge(weather_df, on=['date', 'latitude', 'longitude'])
         visits = visits.drop(columns='date')

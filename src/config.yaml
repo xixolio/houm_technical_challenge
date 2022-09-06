@@ -1,0 +1,11 @@
+API:
+  API_KEY: '9EDRWVRRK4DMWQKTG2HTULSZB'
+
+DATA:
+  PATH: 'data/' # Path relative to src
+  VISITS_DATA_FILENAME: 'visits.csv'
+  USERS_DATA_FILENAME: 'users.csv'
+  PROPERTIES_DATA_FILENAME: 'properties.csv'
+
+APP:
+  VERBOSE: True

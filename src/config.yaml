@@ -1,6 +1,6 @@
 API:
   API_KEY: '9EDRWVRRK4DMWQKTG2HTULSZB'
-
+  BASE_URL: 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
 DATA:
   PATH: 'data/' # Path relative to src
   VISITS_DATA_FILENAME: 'visits.csv'

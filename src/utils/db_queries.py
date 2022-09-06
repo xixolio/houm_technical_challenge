@@ -1,8 +1,6 @@
 import os
 import sqlite3
 import pandas as pd
-from sqlalchemy import create_engine
-
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 

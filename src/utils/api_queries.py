@@ -1,11 +1,15 @@
+import os
 import codecs
 import urllib.request
 import urllib.error
 import pandas as pd
+from src.utils.config_utils import read_yaml
 
-# TODO: move to config file later
-BASE_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/'
-API_KEY = '9EDRWVRRK4DMWQKTG2HTULSZB'
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+
+CONFIG = read_yaml(f'{BASE_PATH}/../config.yaml')
+API_KEY = CONFIG['API']['API_KEY']
+BASE_URL = CONFIG['API']['BASE_URL']
 
 
 def query_weather_api(location, start_date, end_date=None, include='days', verbose=False):

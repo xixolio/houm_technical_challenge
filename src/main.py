@@ -29,3 +29,4 @@ if __name__ == '__main__':
 
     # Question 5
     print(properties_info.get_average_temperature_in_visits_by_location('Suba'))
+

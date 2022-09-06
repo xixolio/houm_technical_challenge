@@ -27,6 +27,9 @@ Each question was coded as an independent method inside the `PropertiesInfo` cla
 - Question 4: `get_average_temperature_in_visits_by_weather_condition`
 - Question 5: `get_average_temperature_in_visits_by_location`
 
+## CONFIG FILE
+A config file can be ofund at _src/config.yaml_. In it, you can specify the API KEY, the location of the csv data, the filenames of the data, among others. 
+
 ## Assumptions
 
 To solve this challenge, the following assumptions were made regarding the nature of the questions and the data provided:

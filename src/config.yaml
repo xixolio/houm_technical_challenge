@@ -8,4 +8,4 @@ DATA:
   PROPERTIES_DATA_FILENAME: 'properties.csv'
 
 APP:
-  VERBOSE: True
+  VERBOSE: False # Prints information about the queries being done to the API

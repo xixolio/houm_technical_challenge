@@ -1,3 +1,15 @@
+"""
+Main class with all the methods needed to get the answers to the challenge. In particular
+the following methods of PropertiesInfo correspond to each question:
+
+- Question 1: `get_total_visits`
+- Question 2: `get_average_properties_by_user`
+- Question 3: `get_average_temperature_in_visits_by_user`
+- Question 4: `get_average_temperature_in_visits_by_weather_condition`
+- Question 5: `get_average_temperature_in_visits_by_location`
+
+"""
+
 import os
 import sys
 sys.path.append('../..')
@@ -24,7 +36,6 @@ class PropertiesInfo:
         self.users_filename = CONFIG['DATA']['USERS_DATA_FILENAME']
         self.app_verbose = CONFIG['APP']['VERBOSE']
         self.conn = get_connection(f'{BASE_PATH}/../', 'weather_api.db')
-
 
     def get_total_visits(self):
         """

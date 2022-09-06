@@ -1,3 +1,8 @@
+"""
+Module that deals with queries to the SQLite DataBase to store and get weather information already
+requested to the API. Check src/sql_queries/ folder to get information about the DB schema
+"""
+
 import os
 import sqlite3
 import pandas as pd

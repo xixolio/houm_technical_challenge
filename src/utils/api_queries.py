@@ -1,3 +1,8 @@
+"""
+Module that deals with queries to the Visualcrossing Weather API.
+For more information about the API, refer to https://www.visualcrossing.com/
+"""
+
 import os
 import codecs
 import urllib.request

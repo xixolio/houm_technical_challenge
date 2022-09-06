@@ -1,3 +1,7 @@
+"""
+Module used to integrate the queries in src/utils/api_queries.py and src/utils/db_queries.py
+"""
+
 import os
 import sys
 

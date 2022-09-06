@@ -16,8 +16,8 @@ For this challenge, weather information at particular locations was requested us
 
 
 ## SQLite DB
-Each time a query for weather information is run, the app first searches the aforementioned DB for the requested values. All values not found are then requested to the API. The choice of a SQLite DB was mainly for usage convenience, but in the future, with bigger data, a more powerful local DB should be used; better yet, a cloud DB could be set. Since the DB used locally for the challenge is extremely light weight, it was uploaded to the repo for convenience of the evaluators. 
-The code used for the creation of the tables can be found in _src/sql_queries_/.
+Each time a query for weather information is run, the app first searches the aforementioned DB for the requested values. All values not found are then requested to the API. The choice of a SQLite DB was mainly for usage convenience, but in the future, with bigger data, a more powerful local DB should be used; better yet, a cloud DB could be set. Since the DB used locally for the challenge is extremely light weight, it was uploaded to the repo for convenience of the evaluators. Just delete the DB and the app will create it automatically with its tables if you want to test the app from scratch.
+The code used for the creation of the tables can be found in _src/sql_queries_/. 
 
 ## Relevant Code
 Each question was coded as an independent method inside the `PropertiesInfo` class, located in _src/properties_info/properties_info.py_. In particular, the following methods answer each question:

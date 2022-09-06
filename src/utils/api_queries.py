@@ -76,6 +76,14 @@ def query_weather_api_multiple_times(locations, start_dates, end_dates=None, inc
         if len(end_dates) != len(start_dates):
             raise Exception("start_dates and end_dates should have same number of elements.")
 
+    # Eliminate duplicate locations, start_dates pairs if present
+    df = pd.DataFrame({'locations': locations,
+                       'start_dates': start_dates})
+    df = df.drop_duplicates()
+
+    locations = df['locations'].values
+    start_dates = df['start_dates'].values
+
     response_df_list = []
 
     if end_dates is None:
@@ -91,15 +99,14 @@ def query_weather_api_multiple_times(locations, start_dates, end_dates=None, inc
     # The api column "name" returns the latitude,longitud pair that we need for the actual dataframe.
     api_df['latitude'] = api_df['name'].apply(lambda x: float(x.split(',')[0]))
     api_df['longitude'] = api_df['name'].apply(lambda x: float(x.split(',')[1]))
-    api_df = api_df.rename(columns={'datetime': 'date'})
+    api_df = api_df.rename(columns={'datetime': 'date', 'temp': 'temperature'})
     api_df['date'] = pd.to_datetime(api_df['date'])
 
-    if include == 'hours':
-        # Extract the time information from date
-        api_df['hour'] = api_df['date'].dt.time
-        api_df['date'] = api_df['date'].dt.date
+    #if include == 'hours':
+    #    # Extract the time information from date
+    #    api_df['hour'] = api_df['date'].dt.time
+    #    api_df['date'] = api_df['date'].dt.date
 
-    print('ACA', api_df)
     return api_df
 
 

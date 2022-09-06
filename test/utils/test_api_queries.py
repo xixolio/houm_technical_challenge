@@ -54,19 +54,21 @@ def test_query_weather_api_multiple_times_daily(mocker,):
 def test_query_weather_api_multiple_times_hourly(mocker,):
     query_weather_api_mock = mocker.patch('src.utils.api_queries.query_weather_api',
                                           side_effect=query_weather_api_hourly)
-    locations = ['Valdivia', 'Puerto Montt']
-    dates = ['2022-01-10', '2022-01-11']
+    locations = ['Valdivia', 'Valdivia', 'Puerto Montt']
+    dates = ['2022-01-10', '2022-01-10', '2022-01-11']
     response_df = query_weather_api_multiple_times(locations=locations, start_dates=dates, include='hours')
     columns = ['date', 'hour', 'latitude', 'longitude', 'temp', 'conditions']
     assert len(response_df) == 2 and all([column in response_df.columns for column in columns])
 
 
+"""
 def test_query_weather_api_multiple_times_hourly_real_data(mocker,):
     locations = ['4.870956,-74.058040']
     dates = ['2022-01-10']
     response_df = query_weather_api_multiple_times(locations=locations, start_dates=dates, include='hours', verbose=True)
     columns = ['date', 'hour', 'latitude', 'longitude', 'temp', 'conditions']
     assert len(response_df) == 24 and all([column in response_df.columns for column in columns])
+"""
 
 
 def test_query_weather_api_multiple_times_different_lengths(mocker,):

@@ -12,3 +12,6 @@ if __name__ == '__main__':
 
     # Question 2
     print(properties_info.get_average_properties_by_user())
+
+    # Question 3
+    print(properties_info.get_average_temperature_in_visits_by_user(2))

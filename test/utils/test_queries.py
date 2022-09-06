@@ -50,7 +50,7 @@ def select_from_daily_weather_data(*args, **kwargs):
 
 def select_from_hourly_weather_data(*args, **kwargs):
     dates = ['2021-01-11']
-    hours = ['14:00']
+    hours = ['14:00:00']
     locations = ['Valdivia']
     latitudes = [0]
     longitudes = [0]

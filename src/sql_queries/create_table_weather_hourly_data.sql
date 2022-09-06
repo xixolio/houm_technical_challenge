@@ -5,5 +5,5 @@ CREATE TABLE weather_hourly_data (
     longitude FLOAT NOT NULL,
     conditions VARCHAR(255),
     temperature FLOAT NOT NULL,
-    PRIMARY KEY (date, latitude, longitude)
+    PRIMARY KEY (date, hour, latitude, longitude)
     )

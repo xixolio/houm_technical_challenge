@@ -33,7 +33,7 @@ def weather_data_sqlite(tmpdir, scope='session'):
     test_data = [
         ('2022-01-10', '00:00:00', 70.3, 30.1, 'Rain', 30.1),
         ('2022-01-10', '20:00:00', 80.3, 30.1, 'Rain', 30.1),
-        ('2022-01-11', '21:00:00', 70.3, 30.1, 'Rain', 30.1),
+        ('2022-01-10', '21:00:00', 70.3, 30.1, 'Rain', 30.1),
         ('2022-01-12', '20:00:00', 70.3, 30.1, 'Rain', 30.1)
     ]
 
@@ -58,17 +58,17 @@ def test_select_from_daily_weather_data_some_rows(weather_data_sqlite):
 
 def test_select_from_hourly_weather_data_some_rows(weather_data_sqlite):
     # Third row doesn't exist in the db
-    dates = ['2022-01-10', '2022-01-11', '2021-01-11']
-    hours = ['00:00:00', '21:00:00', '21:00:00']
+    dates = ['2022-01-10', '2022-01-12', '2021-01-11']
+    hours = ['00:00:00', '20:00:00', '21:00:00']
     #locations = ['Valdivia', 'Santiago', 'Valdivia']
     latitudes = [70.3, 70.3, 0]
     longitudes = [30.1, 30.1, 0]
 
     db_name = 'weather_data'
     conn = weather_data_sqlite
-    df = select_from_hourly_weather_data(conn, dates, hours, latitudes, longitudes)
+    df = select_from_hourly_weather_data(conn, dates, latitudes, longitudes)
 
-    assert len(df) == 2
+    assert len(df) == 3
 
 
 def test_insert_into_weather_daily_data(weather_data_sqlite):

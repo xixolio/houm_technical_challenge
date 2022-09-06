@@ -104,7 +104,7 @@ class PropertiesInfo:
         hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
 
         # Compute the average temperature
-        return self.compute_average_temperature_by_visit(hourly_visits)
+        return self._compute_average_temperature_by_visit(hourly_visits)
 
     def get_average_temperature_in_visits_by_weather_condition(self, weather_condition):
         """
@@ -155,7 +155,7 @@ class PropertiesInfo:
         hourly_visits = self._get_hourly_visits_df(visits)
         hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
 
-        return self.compute_average_temperature_by_visit(hourly_visits)
+        return self._compute_average_temperature_by_visit(hourly_visits)
 
     def get_average_temperature_in_visits_by_location(self, location):
         """
@@ -197,7 +197,7 @@ class PropertiesInfo:
         hourly_visits = self._get_hourly_visits_df(visits)
         hourly_visits = self._add_hourly_temperatures_to_visits(hourly_visits)
 
-        return self.compute_average_temperature_by_visit(hourly_visits)
+        return self._compute_average_temperature_by_visit(hourly_visits)
 
     def _load_visits_data(self):
         """
@@ -262,7 +262,7 @@ class PropertiesInfo:
         return visits
 
     @staticmethod
-    def compute_average_temperature_by_visit(hourly_visits):
+    def _compute_average_temperature_by_visit(hourly_visits):
         """
         Gets the average temperature across all visits in the DataFrame
 

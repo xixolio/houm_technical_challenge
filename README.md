@@ -30,6 +30,7 @@ Each question was coded as an independent method inside the `PropertiesInfo` cla
 ## Assumptions
 
 To solve this challenge, the following assumptions were made regarding the nature of the questions and the data provided:
+- Temperatures are provided in Celsious degrees.
 - To get the average temperature of a particular visit to a property, the temperatures of each hour between `begin_date` and `end_date` were used, not including the `end_date` hour. For example, if the time in `begin_date` was 14:00 and the time in `end_date` was 17:00, we use the hourly temperatures at 14:00, 15:00, and 16:00 to compute the average temperature of the visit.
 - When asked visits done in a particular weather condition such as Rain, we consider the global weather condition of the day given in the `begin_date` column. Moreover, we search for the weather condition as a keyword, so, Rain would also imply Heavy Rain, Light Rain, and so on. This could be improved adding a 'strict' parameter to force specific matches.
 - All dates were transformed to UTC for convenience. I am aware that this implies that the `begin_date` used for daily weather conditions my differ from the original date using in the timezone, but since the data may contain many different countries, this was the simplest approach. A more sophisticated solution in the future is in order.

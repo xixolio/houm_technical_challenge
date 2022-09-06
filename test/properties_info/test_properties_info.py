@@ -166,7 +166,7 @@ class TestAddHourlyTemperaturesToVisits(object):
                                       check_index_type=False)
 
 
-def add_hourly_temperatures_to_visits(*args):
+def input_compute_average_temperature_by_visit():
     data = [
         [1, 1, '2022-01-13 10:00:00', '70', '-40', 49],
         [1, 1, '2022-01-13 11:00:00', '70', '-40', 51],
@@ -183,29 +183,13 @@ def add_hourly_temperatures_to_visits(*args):
     return df
 
 
-class TestGetAverageTemperatureInVisitsByUser(object):
-    def test_on_multiple_visits_multiple_properties(self, mocker,):
+class TestComputeAverageTemperatureByVisit(object):
+    def test_on_multiple_visits(self):
         properties_info = PropertiesInfo()
+        hourly_visits = input_compute_average_temperature_by_visit()
+        actual_output = properties_info._compute_average_temperature_by_visit(hourly_visits)
 
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._load_users_data',
-                     return_value=pd.DataFrame([], columns=['user_id', 'property_id']))
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._load_properties_data',
-                     return_value=pd.DataFrame([], columns=['property_id', 'latitude', 'longitude']))
-
-        visits_columns = ['scheduled_id', 'property_id', 'begin_date', 'end_date', 'status', 'type_visit']
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._load_visits_data',
-                     return_value=pd.DataFrame([], columns=visits_columns))
-
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._visits_preprocessing')
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo.merge_data')
-        #mocker.patch('src.properties_info.properties_info._get_hourly_visits_data')
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._get_hourly_visits_df')
-        mocker.patch('src.properties_info.properties_info.PropertiesInfo._add_hourly_temperatures_to_visits',
-                     side_effect=add_hourly_temperatures_to_visits)
-
-        avg_temperature = properties_info.get_average_temperature_in_visits_by_user(1)
-        print(avg_temperature)
-        assert pytest.approx(avg_temperature) == pytest.approx((50 + 0.5 + 1)/3)
+        assert pytest.approx(actual_output) == pytest.approx((50 + 0.5 + 1)/3)
 
 
 def input_add_daily_conditions_to_visits():
